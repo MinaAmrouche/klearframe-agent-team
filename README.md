@@ -60,4 +60,4 @@ This repo works on `develop`. Its own hook stops Claude from pushing `main`, so 
 
 - Hook: `bash hooks/protect-branch.test.sh`
 - Manifest and layout: `claude plugin validate .`
-- A full session: `claude --plugin-dir <path to this repo or a packaged .plugin>`. Run it in a scratch repo, not in a repo that still has its own copies of these agents and skills, or the names will clash. Once the plugin is installed through claude.ai, this loads a second copy, so test against a scratch repo only.
+- A full session: `claude --plugin-dir <path to this repo, or a packaged file copied to a .zip name>`. `--plugin-dir` silently loads nothing from a `.plugin` file; the same file renamed to `.zip` works. Run it in a scratch repo, not in a repo that still has its own copies of these agents and skills, or the names will clash. Once the plugin is installed through claude.ai, this loads a second copy, so test against a scratch repo only.
