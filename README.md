@@ -13,14 +13,14 @@ It needs the **Superpowers** plugin turned on in the same claude.ai account, bec
 There are two ways. Pick one per machine: with both, Claude loads two copies and the names clash.
 
 - **Through the claude.ai account.** Upload the packaged file (see [Releasing](#releasing)). It then loads in local Claude Code sessions (listed as `synced` in `/plugin`) and in claude.ai/code cloud sessions. A repo's `.claude/settings.json` can't install it for cloud sessions.
-- **From this GitHub repo,** which is also a plugin marketplace named `klearframe`. This works in local Claude Code sessions only. In a session:
+- **From this GitHub repo,** which is also a plugin marketplace named `Klearframe`. This works in local Claude Code sessions only. In a session:
 
   ```
   /plugin marketplace add MinaAmrouche/klearframe-agent-team#main
-  /plugin install klearframe-agent-team@klearframe
+  /plugin install klearframe-agent-team@Klearframe
   ```
 
-  `#main` pins the marketplace to released work; without it, Claude Code follows the repo's default branch. To get a new release, run `/plugin marketplace update klearframe`, or turn on auto-update for `klearframe` under **Marketplaces** in `/plugin`.
+  `#main` pins the marketplace to released work; without it, Claude Code follows the repo's default branch. To get a new release, run `/plugin marketplace update Klearframe`, or turn on auto-update for `Klearframe` under **Marketplaces** in `/plugin`.
 
 ## Using it in a repo
 
