@@ -8,7 +8,19 @@ A Claude Code plugin with a small agent team, the skills that lead it, and a gua
 
 It needs the **Superpowers** plugin turned on in the same claude.ai account, because the skills and agents rely on `superpowers:*` skills.
 
-It is installed through the claude.ai account, so it loads in local Claude Code sessions (listed as `synced` in `/plugin`) and in claude.ai/code cloud sessions. A repo's `.claude/settings.json` can't install it for cloud sessions.
+## Installing it
+
+There are two ways. Pick one per machine: with both, Claude loads two copies and the names clash.
+
+- **Through the claude.ai account.** Upload the packaged file (see [Releasing](#releasing)). It then loads in local Claude Code sessions (listed as `synced` in `/plugin`) and in claude.ai/code cloud sessions. A repo's `.claude/settings.json` can't install it for cloud sessions.
+- **From this GitHub repo,** which is also a plugin marketplace named `klearframe`. This works in local Claude Code sessions only. In a session:
+
+  ```
+  /plugin marketplace add MinaAmrouche/klearframe-agent-team#main
+  /plugin install klearframe-agent-team@klearframe
+  ```
+
+  `#main` pins the marketplace to released work; without it, Claude Code follows the repo's default branch. To get a new release, run `/plugin marketplace update klearframe`, or turn on auto-update for `klearframe` under **Marketplaces** in `/plugin`.
 
 ## Using it in a repo
 
@@ -53,7 +65,7 @@ The guard reads Claude's command with `jq`, or `python3` when `jq` is missing. W
 This repo works on `develop`. Its own hook stops Claude from pushing `main`, so you merge each release yourself.
 
 1. On `develop`: make the change, bump `version` in `.claude-plugin/plugin.json`, commit and push.
-2. Merge `develop` into `main` (you).
+2. Merge `develop` into `main` (you). People who installed from the GitHub marketplace get it on their next marketplace update.
 3. On `main`, run `bash scripts/package.sh`. It writes `klearframe-agent-team-<version>.plugin` from `HEAD`, leaving out `docs/` and `scripts/`.
 4. Upload that file on claude.ai.
 5. Check it loaded: in Claude Code, `/plugin` → **Installed** shows `klearframe-agent-team` at the new version with source `synced`. Then start a new session: `/reload-plugins` in a session that was already open picks up the agents and skills, but not the hook.

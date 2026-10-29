@@ -1,0 +1,12 @@
+{
+  "name": "klearframe",
+  "owner": {
+    "name": "Mina Amrouche"
+  },
+  "plugins": [
+    {
+      "name": "klearframe-agent-team",
+      "source": "./"
+    }
+  ]
+}
