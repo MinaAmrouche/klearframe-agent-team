@@ -56,7 +56,7 @@ This repo works on `develop`. Its own hook stops Claude from pushing `main`, so 
 2. Merge `develop` into `main` (you).
 3. On `main`, run `bash scripts/package.sh`. It writes `klearframe-agent-team-<version>.plugin` from `HEAD`, leaving out `docs/` and `scripts/`.
 4. Upload that file on claude.ai.
-5. Check it loaded: in Claude Code, `/plugin` → **Installed** shows `klearframe-agent-team` at the new version with source `synced`. Run `/reload-plugins` in a session that was already open.
+5. Check it loaded: in Claude Code, `/plugin` → **Installed** shows `klearframe-agent-team` at the new version with source `synced`. Then start a new session: `/reload-plugins` in a session that was already open picks up the agents and skills, but not the hook.
 
 ## Testing locally
 
