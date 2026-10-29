@@ -30,11 +30,11 @@ Project settings come from the **Agent team** section of the project's `CLAUDE.m
 2. **Spec.** Write the detailed design in `docs/superpowers/specs/`. Use `architect` as the builder check. Ask the user anything it marks as needing them, in one message, before the ticket.
 3. **Ticket.** Use the `linear-ticket` skill to create the issue in the project's Linear project. Put the business rules and the major technical calls in the ticket, and link the spec.
 4. **⛔ Ticket check.** Send the user the ticket link and wait for them to approve or correct it. This is brainstorming's written-design approval: the spec is linked for depth. Update the ticket and spec with any corrections, then post a project update.
-5. **Branch.** Fetch the issue and use its Linear `gitBranchName` exactly, branched from the base branch. If the environment assigns a branch you can't rename, keep it, and put the ticket id in every commit and the PR title so Linear links them.
+5. **Branch.** Fetch the issue and use its Linear `gitBranchName` exactly, branched from the base branch. If the environment assigns a branch you can't rename, keep it; the ticket link in the PR description links them.
 6. **Plan and build.** Run superpowers:writing-plans, then superpowers:subagent-driven-development (that's the execution choice; don't ask). Dispatch each task to `backend-engineer` or `frontend-engineer`. Keep its spec-compliance review, and use `senior-code-reviewer` for its code-quality review. When a question for the user comes up, keep working on whatever doesn't depend on it and send all pending questions in one message. If everything left depends on an answer, wait for it.
 7. **Prove it.** Dispatch `qa-engineer` with the ticket, spec and diff, then `senior-code-reviewer` on the whole branch. Fix what they find, then re-run them. Finish with superpowers:verification-before-completion.
 8. **PR.** Open one PR to the base branch (that's the finishing choice; don't ask). Its description has these parts, in order:
-   - **Ticket:** the Linear link.
+   - **Ticket:** the Linear link, always, even when the branch name has the ticket id.
    - **Summary:** three to five lines.
    - **Validation steps:** each step from the ticket marked ✅, ❌ or ⏭️ with what was observed, taken from QA.
    - **Decisions the team made:** each with one line of why.
