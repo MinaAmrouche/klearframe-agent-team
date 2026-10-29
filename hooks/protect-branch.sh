@@ -2,11 +2,23 @@
 # PreToolUse hook for Bash: blocks `git push` to a protected branch and
 # `gh pr merge` into it, so only the user releases to production.
 # Plugin hook, no arguments. Protected branches: AGENT_TEAM_PROTECTED_BRANCHES
-# (space-separated), or `master main` when it is unset or empty.
-set -u
-branches="${AGENT_TEAM_PROTECTED_BRANCHES:-master main}"
+# (space-separated), or `master main` when it is unset or blank.
+set -uf # -f: no globbing in the word loops below
+branches="${AGENT_TEAM_PROTECTED_BRANCHES:-}"
+[ -z "${branches//[[:space:]]/}" ] && branches="master main"
 input=$(cat)
-cmd=$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null) || cmd="$input"
+if command -v jq >/dev/null 2>&1; then
+  cmd=$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null) || cmd="$input"
+elif command -v python3 >/dev/null 2>&1; then
+  cmd=$(printf '%s' "$input" | python3 -c 'import json, sys; print(json.load(sys.stdin)["tool_input"].get("command") or "")' 2>/dev/null) || cmd="$input"
+else
+  # Can't read the command, so fail closed on anything that looks like a push or a merge.
+  if printf '%s' "$input" | grep -Eq 'git.*push|gh[[:space:]]+pr[[:space:]]+merge'; then
+    echo "Blocked: the branch guard needs jq or python3 to check this command. Ask the user to push or merge." >&2
+    exit 2
+  fi
+  exit 0
+fi
 [ -z "$cmd" ] && exit 0
 repo="${CLAUDE_PROJECT_DIR:-.}"
 
@@ -40,12 +52,14 @@ args_after() {
 while IFS= read -r seg; do
   if [[ "$seg" =~ (^|[[:space:]])git([[:space:]]+-C[[:space:]]+[^[:space:]]+)?[[:space:]]+push([[:space:]]|$) ]]; then
     refs=$(args_after push "$seg" | tail -n +2)
+    current=$(git -C "$repo" rev-parse --abbrev-ref HEAD 2>/dev/null)
     while IFS= read -r ref; do
+      ref="${ref//[\"\']/}"
       [ -z "$ref" ] && continue
       dest="${ref##*:}"; dest="${dest#+}"; dest="${dest#refs/heads/}"
+      case "$dest" in HEAD | @) dest="$current" ;; esac
       is_protected "$dest" && block "git push to '$dest'" "$dest"
     done <<< "$refs"
-    current=$(git -C "$repo" rev-parse --abbrev-ref HEAD 2>/dev/null)
     if [ -z "$refs" ] && is_protected "$current"; then
       block "git push from '$current'" "$current"
     fi

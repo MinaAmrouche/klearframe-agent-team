@@ -46,6 +46,8 @@ By default it guards `master` and `main` in every repo, whether or not the repo 
 
 An empty value still guards `master main`; there is no off switch.
 
+The guard reads Claude's command with `jq`, or `python3` when `jq` is missing. With neither, it blocks every `git push` and `gh pr merge` rather than letting them through.
+
 ## Releasing
 
 This repo works on `develop`. Its own hook stops Claude from pushing `main`, so you merge each release yourself.
