@@ -1,4 +1,2 @@
-# Specs and plans: commit them even though a global gitignore excludes docs/superpowers/
-!docs/superpowers/
 .DS_Store
 *.plugin

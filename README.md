@@ -30,7 +30,7 @@ The repo needs:
    - Running the app for validation: <how to start it and where to call it>.
    ```
 
-3. **Specs and plans that get committed.** The team writes them to `docs/superpowers/`. If a global gitignore hides that folder, re-include it in the repo's `.gitignore` with `!docs/superpowers/`.
+The team writes its specs and plans to `docs/superpowers/`. They are part of how the work gets built, so keep them out of git (for example with `docs/superpowers/` in a global gitignore) unless a repo wants them shared.
 
 ## The branch guard
 
