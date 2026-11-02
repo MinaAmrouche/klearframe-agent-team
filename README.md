@@ -3,10 +3,12 @@
 A Claude Code plugin with a small agent team, the skills that lead it, and a guard on production branches.
 
 - **Agents:** `product-analyst`, `architect`, `backend-engineer`, `frontend-engineer`, `qa-engineer` and `senior-code-reviewer`. Claude names them with the plugin prefix, for example `klearframe-agent-team:architect`.
-- **Skills:** `klearframe-agent-team:team-lead` takes a feature from a rough need to a merged pull request. `klearframe-agent-team:whats-next` answers "what's next?" and picks up work where it was left off.
+- **Skills:** `klearframe-agent-team:team-lead` takes a feature from a rough need to a merged pull request. `klearframe-agent-team:whats-next` answers "what's next?" and picks up work where it was left off. `klearframe-agent-team:linear-ticket` writes Linear tickets, and captures an idea as a ticket without starting the work.
 - **Hook:** blocks `git push` to `master` or `main`, and `gh pr merge` into them, so only you release to production.
 
 It needs the **Superpowers** plugin turned on in the same claude.ai account, because the skills and agents rely on `superpowers:*` skills.
+
+The plugin has its own `linear-ticket` skill. If your claude.ai account also has a standalone `linear-ticket` skill, remove it: both would answer "create a ticket".
 
 ## Installing it
 
@@ -32,7 +34,7 @@ The repo needs:
    ```markdown
    ## Agent team
 
-   The agent team comes from the `klearframe-agent-team` plugin. When the user hands off a feature, use the `klearframe-agent-team:team-lead` skill. When they ask what's next, for a status update or to pick up work, use `klearframe-agent-team:whats-next`. This section holds the project's settings for them.
+   The agent team comes from the `klearframe-agent-team` plugin. When the user hands off a feature, use the `klearframe-agent-team:team-lead` skill. When they only ask to create a ticket, use `klearframe-agent-team:linear-ticket`. When they ask what's next, for a status update or to pick up work, use `klearframe-agent-team:whats-next`. This section holds the project's settings for them.
 
    - Linear: team **<team>**, project **<project>**. Branches use the issue's Linear branch name (for example `feature/abc-123`).
    - Business priorities: the Linear document **Business priorities** in that project. Project updates are posted to the same project.
@@ -41,6 +43,8 @@ The repo needs:
    - Runtime modes that must keep working: <modes, or "one">.
    - Running the app for validation: <how to start it and where to call it>.
    ```
+
+3. **Linear's GitHub integration with status automations.** In Linear, connect GitHub, then in the team's settings under **Workflows & automations** set "PR opened" to move the issue to **In Review** and "PR merged" to move it to **Done**. The team lead sets Backlog, Todo and In Progress itself, but never In Review or Done: it relies on these automations, and links each PR with the issue ID in its title and `Fixes <issue ID>` in its description.
 
 The team writes its specs and plans to `docs/superpowers/`. They are part of how the work gets built, so keep them out of git (for example with `docs/superpowers/` in a global gitignore) unless a repo wants them shared.
 
