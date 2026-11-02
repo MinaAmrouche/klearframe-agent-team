@@ -20,8 +20,8 @@ The user often asks for a ticket only so an idea isn't forgotten. Decide which r
 ## Capture only
 
 1. Write the ticket from what the user said, following **Ticket structure**. If the topic is ambiguous, ask one focused question first.
-2. Create it in the project's Linear project with the status **Backlog**.
-3. Set its priority as `team-rules.md` allows: from the priorities document and technical urgency (critical bugs are Urgent). If neither gives a priority, leave it without one.
+2. Work out its priority as `team-rules.md` allows: from the priorities document and technical urgency (critical bugs are Urgent). If neither gives a priority, ask the user which they prefer, with two options: no priority, or your suggestion (Urgent, High, Medium or Low) with one line of why.
+3. Create it in the project's Linear project with the status **Backlog** and that priority.
 4. Send the user the ticket's title and link, and stop. Don't start brainstorming, don't dispatch agents and don't post a project update. When the user picks the ticket later (through `whats-next` or by handing it off), the `team-lead` skill takes it from its Shape step.
 
 ## Ticket structure
