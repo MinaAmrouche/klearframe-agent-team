@@ -1,6 +1,6 @@
 # Team rules
 
-Shared by the `team-lead` and `whats-next` skills. Project settings (Linear project, base and production branches, priorities document, how to verify) come from the **Agent team** section of the project's `CLAUDE.md`.
+Shared by the `team-lead`, `whats-next` and `linear-ticket` skills. Project settings (Linear project, base and production branches, priorities document, how to verify) come from the **Agent team** section of the project's `CLAUDE.md`.
 
 ## Who decides
 
@@ -19,6 +19,18 @@ The priorities document in Linear belongs to the user. It has three sections, **
 
 **Make these yourself:** set each issue's priority from the document and technical urgency (critical bugs are Urgent); add blocking links, labels and estimates; keep statuses true to reality; link PRs. Until the priorities document exists, leave existing priorities as they are.
 
+**Ticket statuses** follow the work:
+
+| Status | Set by | When |
+|---|---|---|
+| Backlog | you | the ticket is created, before any shaping |
+| Todo | you | shaping starts with the user |
+| In Progress | you | the branch is created and implementation starts |
+| In Review | Linear | a linked PR is opened |
+| Done | Linear | the linked PR is merged |
+
+Never set In Review or Done yourself: Linear's GitHub automations do it, as long as the PR title starts with the issue ID and its description has `Fixes <issue ID>`. If a ticket didn't move when its PR was opened or merged, tell the user: the link or the automation is broken.
+
 **Ask first:** anything that moves an item against the user's order, closing or cancelling a ticket, and any edit to the priorities document.
 
 ## Merging
@@ -33,7 +45,7 @@ A PR is ready to merge when every one of these holds:
 4. No review comment is unresolved and no question for the user is open.
 5. The user hasn't asked to review it, and its ticket has no `review-before-merge` label.
 
-Then merge it the way the project's recent PRs were merged, delete the branch (remote and local), move the ticket to Done and post a project update.
+Then merge it the way the project's recent PRs were merged, delete the branch (remote and local), check that Linear moved the ticket to Done and post a project update.
 
 ## Project updates
 

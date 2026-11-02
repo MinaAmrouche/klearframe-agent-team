@@ -1,7 +1,7 @@
 {
   "name": "klearframe-agent-team",
-  "version": "0.2.0",
-  "description": "A six-agent product team with team-lead and whats-next skills, plus a guard that keeps Claude from pushing or merging to master and main.",
+  "version": "0.3.0",
+  "description": "A six-agent product team with team-lead, whats-next and linear-ticket skills, plus a guard that keeps Claude from pushing or merging to master and main.",
   "author": {
     "name": "Mina Amrouche"
   }
