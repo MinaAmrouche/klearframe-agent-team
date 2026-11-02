@@ -33,6 +33,11 @@ Never set In Review or Done yourself: Linear's GitHub automations do it, as long
 
 **Ask first:** anything that moves an item against the user's order, closing or cancelling a ticket, and any edit to the priorities document.
 
+## Branch history
+
+- **Updating a branch:** rebase it on the base branch and push with `--force-with-lease`. Never merge the base branch into it.
+- **Tidying before merge:** once the PR meets every merge condition, fold fix-up and review commits into the branch commit they belong to (`git commit --fixup=<commit>`, then `GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash <base branch>`). No commit should hold changes that would make sense in another commit of the same branch. Then check that the content didn't change (`git diff <branch tip before tidying> HEAD` prints nothing) and push with `--force-with-lease`. Skip this when the project squash-merges its PRs: the branch commits never reach the base branch.
+
 ## Merging
 
 You merge into the base branch, never into the production branch. A hook blocks pushes and merges to the production branch; if it fires, tell the user what needs releasing and stop there.
@@ -45,7 +50,7 @@ A PR is ready to merge when every one of these holds:
 4. No review comment is unresolved and no question for the user is open.
 5. The user hasn't asked to review it, and its ticket has no `review-before-merge` label.
 
-Then merge it the way the project's recent PRs were merged, delete the branch (remote and local), check that Linear moved the ticket to Done and post a project update.
+Then tidy the branch history (see **Branch history**), merge it the way the project's recent PRs were merged, delete the branch (remote and local), check that Linear moved the ticket to Done and post a project update.
 
 ## Project updates
 
