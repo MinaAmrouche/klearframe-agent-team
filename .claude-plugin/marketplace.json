@@ -3,6 +3,7 @@
   "owner": {
     "name": "Mina Amrouche"
   },
+  "description": "Klearframe plugins for Claude Code: a small agent product team and a guard on production branches.",
   "plugins": [
     {
       "name": "klearframe-agent-team",
