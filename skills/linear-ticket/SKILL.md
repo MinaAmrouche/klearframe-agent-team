@@ -38,6 +38,7 @@ Clear, concise prose, with these sections:
 
 - **Context:** one or two sentences on why this ticket exists and what problem it solves. Skip obvious context.
 - **What needs to be done:** a short numbered list of concrete, actionable steps or changes.
+- **Decisions:** only when the work was shaped with the user. Each decision they made in one line, numbered as in the spec (D1, D2, …), so the plan check and the reviews can confirm each one is delivered. Leave the section out otherwise.
 - **Docs / tests:** only when the ticket changes user-facing behaviour, a public API, or code with existing tests. Say what to update or add. Leave the section out for internal refactors with no observable change and no test surface.
 - **Validation steps:** always. A numbered list someone can follow to check the ticket is done, tailored to its type:
   - *Feature:* the happy path, then at least one edge case.

@@ -6,18 +6,18 @@ You act as CEO/CTO: you set the business rules, the priorities and the major tec
 
 ## What's inside
 
-- **Agents:** `product-analyst`, `architect`, `backend-engineer`, `frontend-engineer`, `qa-engineer` and `senior-code-reviewer`. Claude names them with the plugin prefix, for example `klearframe-agent-team:architect`.
+- **Agents:** `product-analyst`, `architect`, `backend-engineer`, `frontend-engineer`, `qa-engineer` and `senior-code-reviewer`, plus three specialists the team lead calls only when a branch needs them: `security-reviewer`, `silent-failure-hunter` and `ux-copy-reviewer`. Claude names them with the plugin prefix, for example `klearframe-agent-team:architect`.
 - **Skills:** `klearframe-agent-team:team-lead` takes a feature from a rough need to a merged pull request. `klearframe-agent-team:whats-next` answers "what's next?" and picks up work where it was left off. `klearframe-agent-team:linear-ticket` writes Linear tickets, and captures an idea as a ticket without starting the work.
-- **Hook:** blocks `git push` to `master` or `main`, and `gh pr merge` into them, so only you release to production.
+- **Hook:** blocks `git push` to `master` or `main`, and `gh pr merge` into them, so only you release to production. It also blocks git commands that skip the project's git hooks (`--no-verify`, `core.hooksPath`, or a hook manager's skip variable such as `HUSKY=0`), including when they're hidden behind `bash -c`, `eval`, a pipe into a shell or a git alias.
 
 ## How a feature flows
 
 1. **Ticket.** The team lead files the need as a Linear ticket in Backlog.
 2. **Shape.** The product analyst and the architect read the code and draft the decisions only you can make. The team lead asks you about them one at a time.
-3. **Spec and one approval.** The team lead writes the spec, puts the business rules and validation steps on the ticket, and asks you to approve the ticket. That's the only approval.
-4. **Build.** It plans the work and hands each task to the backend or frontend engineer, test-first, with a code review after each task.
-5. **Prove it.** The QA engineer adds adversarial tests and runs the ticket's validation steps on the real app; the senior reviewer reviews the whole branch.
-6. **Pull request.** The team lead opens a PR linked to the ticket and merges it into your base branch once every merge condition holds. Releasing to production stays with you.
+3. **Spec and one approval.** The team lead writes the spec with your decisions numbered, puts the business rules and validation steps on the ticket, and asks you to approve the ticket. That's the only approval.
+4. **Build.** It plans the work, has the architect check the plan delivers every decision in full, and hands each task to the backend or frontend engineer, test-first, with a code review after each task.
+5. **Prove it.** The QA engineer targets what no test covered, adds adversarial tests and runs the ticket's validation steps on the real app. The senior reviewer checks the whole branch against the spec, joined by the specialists the diff calls for. The team lead sorts every finding before fixing it, and stops to ask you after 3 rounds that don't converge.
+6. **Pull request.** The team lead opens a PR linked to the ticket, listing any guesses it made while waiting for you and what a rollback would cost, and merges it into your base branch once every merge condition holds. Releasing to production stays with you.
 
 ## Requirements
 
@@ -26,6 +26,7 @@ You act as CEO/CTO: you set the business rules, the priorities and the major tec
 - **The Linear connector (MCP),** for tickets, priorities and project updates.
 - **A GitHub repo connected to Linear** (see [Using it in a repo](#using-it-in-a-repo)).
 - **`jq` or `python3`** for the branch guard.
+- **Optional: the Playwright connector (MCP),** so the QA engineer can run the ticket's UI validation steps in a real browser. Without it, those steps are marked ⏭️ with the reason.
 
 ## Installing it
 
@@ -81,7 +82,7 @@ By default it guards `master` and `main` in every repo, whether or not the repo 
 
 An empty value still guards `master main`; there is no off switch.
 
-The guard reads Claude's command with `jq`, or `python3` when `jq` is missing. With neither, it blocks every `git push` and `gh pr merge` rather than letting them through.
+The guard reads Claude's command with `jq`, or `python3` when `jq` is missing. With neither, it blocks every `git push`, every `gh pr merge` and anything that looks like skipping git hooks, rather than letting them through.
 
 ## Maintaining
 
