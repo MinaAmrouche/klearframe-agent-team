@@ -8,7 +8,7 @@ You act as CEO/CTO: you set the business rules, the priorities and the major tec
 
 - **Agents:** `product-analyst`, `architect`, `backend-engineer`, `frontend-engineer`, `qa-engineer` and `senior-code-reviewer`, plus three specialists the team lead calls only when a branch needs them: `security-reviewer`, `silent-failure-hunter` and `ux-copy-reviewer`. Claude names them with the plugin prefix, for example `klearframe-agent-team:architect`.
 - **Skills:** `klearframe-agent-team:team-lead` takes a feature from a rough need to a merged pull request. `klearframe-agent-team:whats-next` answers "what's next?" and picks up work where it was left off. `klearframe-agent-team:linear-ticket` writes Linear tickets, and captures an idea as a ticket without starting the work.
-- **Hook:** blocks `git push` to `master` or `main`, and `gh pr merge` into them, so only you release to production. It also blocks git commands that skip the project's git hooks (`--no-verify`, `core.hooksPath`, `HUSKY=0`).
+- **Hook:** blocks `git push` to `master` or `main`, and `gh pr merge` into them, so only you release to production. It also blocks git commands that skip the project's git hooks (`--no-verify`, `core.hooksPath`, or a hook manager's skip variable such as `HUSKY=0`), including when they're hidden behind `bash -c`, `eval`, a pipe into a shell or a git alias.
 
 ## How a feature flows
 
@@ -82,7 +82,7 @@ By default it guards `master` and `main` in every repo, whether or not the repo 
 
 An empty value still guards `master main`; there is no off switch.
 
-The guard reads Claude's command with `jq`, or `python3` when `jq` is missing. With neither, it blocks every `git push` and `gh pr merge` rather than letting them through.
+The guard reads Claude's command with `jq`, or `python3` when `jq` is missing. With neither, it blocks every `git push`, every `gh pr merge` and anything that looks like skipping git hooks, rather than letting them through.
 
 ## Maintaining
 

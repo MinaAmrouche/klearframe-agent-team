@@ -95,6 +95,23 @@ run 2 "git push origin 'master'"
 run 0 'git push -u origin HEAD'
 run 0 'git push origin @'
 
+# Pushes and merges hidden behind a shell, a wrapper or a variable
+run 2 'bash -c "git push origin main"'
+run 2 "sh -c 'git push origin master'"
+run 2 'eval "git push origin main"'
+run 2 'sudo git push origin main'
+run 2 'git push origin main 2>&1 | tail -n 3'
+run 2 'B=main; git push origin $B'
+run 2 'git push origin "$(git branch --show-current)"'
+run 2 'git push origin "refs/heads/*:refs/heads/*"'
+run 2 'git --git-dir .git push origin main'
+run 2 'bash -c "gh pr merge 12 --squash"'
+run 2 'gh pr merge -b "body text" 12'
+run 0 'git push --all origin'
+run 0 'git push origin develop 2>&1 | tail -n 3'
+run 0 'git push -o ci.skip origin develop'
+run 0 'gh pr merge --body "merges 12" 13'
+
 # Without jq: python3 reads the command; with neither, pushes and merges are blocked
 run_path "$tmp/nojq" 2 'git push origin main'
 run_path "$tmp/nojq" 0 'git push origin develop'
@@ -128,6 +145,10 @@ run 2 'git -c core.hooksPath=/dev/null commit -m wip'
 run 2 'HUSKY=0 git commit -m wip'
 run_path "$tmp/nojq" 2 'git commit --no-verify -m wip'
 run_path "$tmp/nojq-nopy" 2 'git commit --no-verify -m wip'
+run_path "$tmp/nojq-nopy" 2 'git commit -n -m wip'
+run_path "$tmp/nojq-nopy" 2 'HUSKY=0 git commit -m wip'
+run_path "$tmp/nojq-nopy" 2 'git config core.hooksPath /dev/null'
+run_path "$tmp/nojq-nopy" 0 'git log -n 5'
 # ...but not a message, a heredoc body or another command that mentions it
 run 0 'git commit -m "Block --no-verify in the hook"'
 run 0 "git commit -m 'skip -n here'"
@@ -151,11 +172,110 @@ run 0 'git push -n origin develop'
 run 0 'git merge -n feature'
 run 0 'cat <<< "git commit --no-verify"'
 
+# Deliberate workarounds: hook-manager variables, in any form
+run 2 'export HUSKY=0; git commit -m wip'
+run 2 'export HUSKY; git commit -m wip'
+run 2 'HUSKY="0" git commit -m wip'
+run 2 "HUSKY='0' git commit -m wip"
+run 2 'env HUSKY=0 git commit -m wip'
+run 2 'declare -x HUSKY=0'
+run 2 'HUSKY_SKIP_HOOKS=1 git commit -m wip'
+run 2 'LEFTHOOK=0 git commit -m wip'
+run 2 'LEFTHOOK_EXCLUDE=lint git commit -m wip'
+run 2 'SKIP=eslint git commit -m wip'
+# ...core.hooksPath, however it is set
+run 2 'git -c "core.hooksPath=/dev/null" commit -m wip'
+run 2 'git -c core.HooksPath=/x commit -m wip'
+run 2 'git -c CORE.HOOKSPATH=/x commit -m wip'
+run 2 'git -c core.hooksPath status'
+run 2 'git --config-env=core.hooksPath=X commit -m wip'
+run 2 'git --config-env core.hooksPath=X commit -m wip'
+run 2 'GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0=/x git commit'
+run 2 "GIT_CONFIG_PARAMETERS=\"'core.hooksPath'='/x'\" git commit"
+run 2 'git config core.hooksPath /dev/null && git commit -m wip'
+run 2 'git config --local core.hooksPath /dev/null'
+run 2 'git config -f .git/config core.hooksPath /dev/null'
+run 2 'git config --unset core.hooksPath'
+run 2 'git config set core.hooksPath /dev/null'
+run 2 'git -c "$K=/x" commit'
+# ...a shortened --no-verify, or -n on am
+run 2 'git commit --no-veri -m wip'
+run 2 'git commit --no-ve -m wip'
+run 2 'git push --no-verif origin develop'
+run 2 'git pull --no-verify'
+run 2 'git am -n patch.mbox'
+run 2 'git am -3n patch.mbox'
+# ...a git alias that skips them
+run 2 "git config alias.ci 'commit --no-verify'"
+run 2 "git config --global alias.ci '!git commit -n'"
+run 2 "git -c alias.ci='commit --no-verify' ci -m wip"
+# ...or another way to name or run git
+run 2 'bash -c "git commit --no-verify -m wip"'
+run 2 "sh -lc 'git commit -n'"
+run 2 'eval "git commit --no-verify"'
+run 2 'eval git commit -n'
+run 2 '"git" commit --no-verify'
+run 2 'g""it commit --no-verify'
+run 2 '\git commit -n'
+run 2 '/usr/bin/git commit -n'
+run 2 '$GIT commit --no-verify'
+run 2 '$(which git) commit -n'
+run 2 'git $SUB --no-verify'
+run 2 'git --git-dir .git commit --no-verify'
+run 2 'git --work-tree . commit -n'
+run 2 'sudo -u bob git commit -n'
+run 2 'timeout 60 git commit --no-verify'
+run 2 'nice -n 10 git commit -n'
+run 2 'xargs -I {} git commit --no-verify -m {}'
+run 2 '{ git commit -n; }'
+run 2 'echo $(git commit --no-verify)'
+run 2 'echo "$(git commit -n)"'
+run 2 'echo `git commit -n`'
+run 2 'GIT_AUTHOR_NAME="a b" git commit -n'
+run 2 'echo "git commit --no-verify" | sh'
+run 2 "printf 'git commit -n\\n' | bash"
+run 2 'bash <<< "git commit --no-verify"'
+run 2 'bash <<EOF
+git commit --no-verify
+EOF'
+run 2 "cat <<'EOF' | sh
+git commit -n
+EOF"
+# ...but reading the setting, other variables and other shells are fine
+run 0 'git config core.hooksPath'
+run 0 'git config --get core.hooksPath'
+run 0 'git config get core.hooksPath'
+run 0 'git config --list'
+run 0 'git config alias.st status'
+run 0 'git config user.name "Ada Lovelace"'
+run 0 'git -c user.email=a@b.c commit -m wip'
+run 0 'git -c "user.email=$EMAIL" commit -m wip'
+run 0 'MY_HUSKY=0 npm test'
+run 0 'echo HUSKY=0'
+run 0 'git commit -m "set HUSKY=0 in CI"'
+run 0 'git commit -m wip # --no-verify'
+run 0 'git commit --no-verbose -m wip'
+run 0 'git pull --no-verify-signatures'
+run 0 'bash scripts/build.sh --no-verify'
+run 0 'bash -c "npm test"'
+run 0 'curl -fsSL https://example.com/install.sh | bash'
+run 0 'cat <<EOF > notes.md
+git commit --no-verify
+EOF'
+run 0 'git commit -F - <<EOF
+Explain why bash -c "git commit -n" is blocked
+EOF'
+run 0 'git am patch.mbox'
+run 0 'git log --oneline -n 3 | cat'
+run 0 'git commit -m "$(date)" 2>&1 | tail -n 5'
+
 # A bare push while on the protected branch is blocked.
 git -C "$repo" switch -q -c master
 run 2 'git push'
 run 2 'git push -u origin'
 run 0 'git push origin develop'
+run 2 'git push --all origin'
+run 2 'git push --mirror origin'
 git -C "$repo" switch -q -c main
 run 2 'git push'
 run 2 'git push -u origin HEAD'

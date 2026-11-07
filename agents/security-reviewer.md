@@ -1,6 +1,6 @@
 ---
 name: security-reviewer
-description: Use when a change touches authentication, permissions, sessions, secrets, or input that comes from users, files or other systems, to find exploitable security issues before merge. Read-only; it reports and never changes code.
+description: Use when a change adds or changes authentication, permissions or sessions, handles secrets, adds an endpoint or server action, or passes outside input to SQL, a shell, file paths, HTML or file uploads, to find exploitable security issues before merge. Read-only; it reports and never changes code.
 model: opus
 disallowedTools: Write, Edit, NotebookEdit
 color: red

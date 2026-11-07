@@ -40,7 +40,7 @@ End with a question asking which option to take. If you drafted the priorities d
 ## 4. Pick up what they chose
 
 - **Open PR:** check the ticket, the diff and the review comments. Run lint, tests and build fresh, and check the validation steps in the description. Then put it in one state and act on it:
-  - *Needs fixes* (failures or review comments): sort them (**Review findings** in `team-rules.md`), fix them, then re-run whoever raised them, within the fix-round limit (the PR's Reviews part has the rounds used so far). Update the Reviews part.
+  - *Needs fixes* (failures or review comments): sort them (**Review findings** in `team-rules.md`), fix them, then re-run whoever raised them, within the fix-round limit (the PR's Reviews part has the rounds used since the last reset). Update the Reviews part.
   - *Needs testing* (validation steps missing or ⏭️): run `qa-engineer`.
   - *Needs more work* (ticket scope not done): continue it with the `team-lead` skill from its Plan and build step.
   - *Ready* (every merge condition in `team-rules.md` holds): merge it.

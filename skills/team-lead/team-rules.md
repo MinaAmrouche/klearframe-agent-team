@@ -47,7 +47,7 @@ Drop a low-risk finding when its only fix is one more guard, check or fallback f
 
 A reviewer's **Not verified** items are not findings yet. Check each one yourself and sort it like a finding; if you can't settle it, list it under the PR's Open items.
 
-**Fix rounds.** A round is fixing findings, then re-running whoever raised them. From the whole-branch checks on (team-lead step 8, and whats-next), stop after 3 rounds that still leave a critical or major finding or a failing validation step, or as soon as a fixed failure comes back. Post a project update set to *at risk*, and tell the user what keeps failing, what was tried and what you recommend. Within a single task, superpowers:subagent-driven-development keeps its own review loop.
+**Fix rounds.** A round is fixing findings, then re-running whoever raised them. When you re-run a reviewer, give it the findings you sorted **False** or **Later**, each with its line of why, so it doesn't raise them again. From the whole-branch checks on (team-lead step 8, and whats-next), stop after 3 rounds that still leave a critical or major finding or a failing validation step, or as soon as a fixed failure comes back. Post a project update set to *at risk*, and tell the user what keeps failing, what was tried and what you recommend. Once the user answers with a direction, the count starts again at 0; note the reset in the PR's Reviews part. Within a single task, superpowers:subagent-driven-development keeps its own review loop.
 
 ## When the user isn't there
 
@@ -59,7 +59,7 @@ When a finding repeats a mistake already made earlier in the branch or in a rece
 
 ## Branch history
 
-- **Git hooks:** never skip or turn them off (`--no-verify`, `core.hooksPath`, `HUSKY=0`). Fix what they report, or ask the user.
+- **Git hooks:** never skip or turn them off (`--no-verify`, `core.hooksPath`, `HUSKY=0` or another hook manager's skip variable). Fix what they report, or ask the user.
 - **Updating a branch:** rebase it on the base branch and push with `--force-with-lease`. Never merge the base branch into it.
 - **Tidying before merge:** once the PR meets every merge condition, fold fix-up and review commits into the branch commit they belong to (`git commit --fixup=<commit>`, then `GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash <base branch>`). No commit should hold changes that would make sense in another commit of the same branch. Then check that the content didn't change (`git diff <branch tip before tidying> HEAD` prints nothing) and push with `--force-with-lease`. Skip this when the project squash-merges its PRs: the branch commits never reach the base branch.
 
@@ -70,7 +70,7 @@ You merge into the base branch, never into the production branch. A hook blocks 
 A PR is ready to merge when every one of these holds:
 
 1. Lint, tests and build pass on the PR branch, run fresh by you (and CI is green, if the project has CI).
-2. `senior-code-reviewer` gave **Approve**, or **Approve with minor changes** and those changes are done. Every specialist reviewer that ran (listed in the PR's Reviews part) gave ✅.
+2. `senior-code-reviewer` gave **Approve**, or **Approve with minor changes** and those changes are done. Every specialist reviewer that ran (listed in the PR's Reviews part) gave ✅. A verdict also counts as given when every finding still open in it was sorted **False** or **Later**, with the reason in the PR's Reviews part.
 3. Every validation step is ✅, or ⏭️ with a reason written in the PR.
 4. No review comment is unresolved, and no question for the user or open assumption is left.
 5. The user hasn't asked to review it, and its ticket has no `review-before-merge` label.
