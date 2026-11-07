@@ -33,6 +33,28 @@ Never set In Review or Done yourself: Linear's GitHub automations do it, as long
 
 **Ask first:** anything that moves an item against the user's order, closing or cancelling a ticket, and any edit to the priorities document.
 
+## Review findings
+
+Before fixing anything a reviewer or QA reports, check each finding against the code and sort it:
+
+- **False:** the claim doesn't hold, or the code already handles it. Drop it with one line of why.
+- **Back to the user:** the fix depends on a business rule or a major technical call the ticket doesn't settle. Ask them.
+- **Plan problem:** the code does what the plan said, and the plan missed something. Fix the plan and redo that part instead of patching around it; note what to keep.
+- **Patch:** caused by this change, and the smallest fix is local and adds no new public surface.
+- **Later:** real, but not caused by this change. Create a Backlog ticket with the `linear-ticket` skill and list it under the PR's Open items.
+
+Drop a low-risk finding when its only fix is one more guard, check or fallback for a state nothing can reach: it adds code without removing a risk.
+
+**Fix rounds.** A round is fixing findings, then re-running whoever raised them. Stop after 3 rounds that still leave a critical or major finding or a failing validation step, or as soon as a fixed failure comes back. Post a project update set to *at risk*, and tell the user what keeps failing, what was tried and what you recommend.
+
+## When the user isn't there
+
+When a question for the user comes up mid-build, keep working on what doesn't depend on it. If going on needs a guess, record the guess, what it's based on, and how hard it would be to undo. Build only on guesses that are cheap to undo; anything else waits for the user. The PR lists every guess under **Open assumptions**, the one the user is most likely to overrule first, and each one counts as an open question for merge condition 4.
+
+## Lessons from repeated findings
+
+When a finding repeats a mistake already made earlier in the branch or in a recent PR, the project's rules are missing something. Propose the smallest change that stops it coming back, preferring a check over prose: a lint rule, a test or a hook before a one-line `CLAUDE.md` rule. Put the proposal under the PR's Open items, and apply it only once the user agrees.
+
 ## Branch history
 
 - **Updating a branch:** rebase it on the base branch and push with `--force-with-lease`. Never merge the base branch into it.
@@ -45,9 +67,9 @@ You merge into the base branch, never into the production branch. A hook blocks 
 A PR is ready to merge when every one of these holds:
 
 1. Lint, tests and build pass on the PR branch, run fresh by you (and CI is green, if the project has CI).
-2. `senior-code-reviewer` gave **Approve**, or **Approve with minor changes** and those changes are done.
+2. `senior-code-reviewer` gave **Approve**, or **Approve with minor changes** and those changes are done. Every specialist reviewer that ran has no critical or major finding left.
 3. Every validation step is ✅, or ⏭️ with a reason written in the PR.
-4. No review comment is unresolved and no question for the user is open.
+4. No review comment is unresolved, and no question for the user or open assumption is left.
 5. The user hasn't asked to review it, and its ticket has no `review-before-merge` label.
 
 Then tidy the branch history (see **Branch history**), merge it the way the project's recent PRs were merged, delete the branch (remote and local), check that Linear moved the ticket to Done and post a project update.
@@ -58,6 +80,7 @@ Post a status update on the Linear project when something changes:
 - the user approves a ticket at the ticket check
 - a PR is opened or merged
 - a critical bug is found
+- work hits the fix-round limit
 - the priorities change
 - a decision changes direction
 - work becomes blocked on the user

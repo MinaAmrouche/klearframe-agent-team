@@ -41,7 +41,7 @@ run_path() { # hook-PATH expected-exit command
 
 # PATHs without jq: the tools the hook needs, with and without python3.
 mkdir -p "$tmp/nojq" "$tmp/nojq-nopy"
-for t in cat git grep head tail tr; do
+for t in cat git grep head sed tail tr; do
   ln -s "$(command -v "$t")" "$tmp/nojq/$t"
   ln -s "$(command -v "$t")" "$tmp/nojq-nopy/$t"
 done
@@ -101,6 +101,29 @@ run_path "$tmp/nojq" 0 'git push origin develop'
 run_path "$tmp/nojq-nopy" 2 'git push origin develop'
 run_path "$tmp/nojq-nopy" 2 'gh pr merge 13'
 run_path "$tmp/nojq-nopy" 0 'ls -la'
+
+# Skipping git hooks is blocked
+run 2 'git commit --no-verify -m wip'
+run 2 'git commit -n -m wip'
+run 2 'git commit -anm wip'
+run 2 'git push --no-verify origin develop'
+run 2 'npm test && git commit --no-verify -m wip'
+run 2 'git -C /some/dir commit --no-verify'
+run 2 'GIT_AUTHOR_NAME=x git commit -n'
+run 2 'git merge --no-verify feature'
+run_path "$tmp/nojq" 2 'git commit --no-verify -m wip'
+run_path "$tmp/nojq-nopy" 2 'git commit --no-verify -m wip'
+# ...but not a message, a heredoc line or another command that mentions it
+run 0 'git commit -m "Block --no-verify in the hook"'
+run 0 "git commit -m 'skip -n here'"
+run 0 'git commit -m "say \"--no-verify\" twice" --amend'
+run 0 "git commit -F - <<'EOF'
+Block git commit --no-verify
+EOF"
+run 0 'echo --no-verify'
+run 0 'git log -n 5'
+run 0 'git commit --amend --no-edit'
+run 0 'grep -rn -- --no-verify docs'
 
 # A bare push while on the protected branch is blocked.
 git -C "$repo" switch -q -c master

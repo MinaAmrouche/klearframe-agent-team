@@ -1,7 +1,7 @@
 {
   "name": "klearframe-agent-team",
-  "version": "0.4.1",
-  "description": "A six-agent product team with team-lead, whats-next and linear-ticket skills, plus a guard that keeps Claude from pushing or merging to master and main.",
+  "version": "0.5.0",
+  "description": "A nine-agent product team with team-lead, whats-next and linear-ticket skills, plus a guard that keeps Claude from pushing or merging to master and main, or skipping git hooks.",
   "author": {
     "name": "Mina Amrouche"
   },

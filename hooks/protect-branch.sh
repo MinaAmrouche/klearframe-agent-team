@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # PreToolUse hook for Bash: blocks `git push` to a protected branch and
-# `gh pr merge` into it, so only the user releases to production.
+# `gh pr merge` into it, so only the user releases to production. Also blocks
+# git commands that skip the project's git hooks (--no-verify, or -n on commit).
 # Plugin hook, no arguments. Protected branches: AGENT_TEAM_PROTECTED_BRANCHES
 # (space-separated), or `master main` when it is unset or blank.
 set -uf # -f: no globbing in the word loops below
@@ -13,8 +14,8 @@ elif command -v python3 >/dev/null 2>&1; then
   cmd=$(printf '%s' "$input" | python3 -c 'import json, sys; print(json.load(sys.stdin)["tool_input"].get("command") or "")' 2>/dev/null) || cmd="$input"
 else
   # Can't read the command, so fail closed on anything that looks like a push or a merge.
-  if printf '%s' "$input" | grep -Eq 'git.*push|gh[[:space:]]+pr[[:space:]]+merge'; then
-    echo "Blocked: the branch guard needs jq or python3 to check this command. Ask the user to push or merge." >&2
+  if printf '%s' "$input" | grep -Eq 'git.*push|gh[[:space:]]+pr[[:space:]]+merge|git.*--no-verify'; then
+    echo "Blocked: the branch guard needs jq or python3 to check this command. Ask the user to run it." >&2
     exit 2
   fi
   exit 0
@@ -72,4 +73,18 @@ while IFS= read -r seg; do
     is_protected "$base" && block "gh pr merge into '$base'" "$base"
   fi
 done < <(printf '%s\n' "$cmd" | tr ';&|' '\n\n\n')
+
+# Skipping the project's git hooks. Quoted text (such as a commit message) is
+# removed first, and only segments that start with git count, so a message or
+# heredoc line that mentions --no-verify is not blocked.
+unquoted=$(printf '%s\n' "$cmd" | sed -E "s/'[^']*'//g; s/\"([^\"\\\\]|\\\\.)*\"//g")
+git_cmd='^[[:space:]]*([A-Za-z_][A-Za-z0-9_]*=[^[:space:]]*[[:space:]]+)*git([[:space:]]+-[cC][[:space:]]+[^[:space:]]+)*[[:space:]]+'
+while IFS= read -r seg; do
+  [[ "$seg" =~ $git_cmd ]] || continue
+  if [[ "$seg" =~ [[:space:]]--no-verify([[:space:]]|$) ]] ||
+    { [[ "$seg" =~ ${git_cmd}commit([[:space:]]|$) ]] && [[ "$seg" =~ [[:space:]]-[A-Za-z]*n[A-Za-z]*([[:space:]]|$) ]]; }; then
+    echo "Blocked: this skips the project's git hooks (--no-verify). Fix what the hooks report instead, or ask the user." >&2
+    exit 2
+  fi
+done < <(printf '%s\n' "$unquoted" | tr ';&|' '\n\n\n')
 exit 0
