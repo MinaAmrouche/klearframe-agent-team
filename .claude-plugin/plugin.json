@@ -1,8 +1,12 @@
 {
   "name": "klearframe-agent-team",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "A six-agent product team with team-lead, whats-next and linear-ticket skills, plus a guard that keeps Claude from pushing or merging to master and main.",
   "author": {
     "name": "Mina Amrouche"
-  }
+  },
+  "homepage": "https://github.com/MinaAmrouche/klearframe-agent-team",
+  "repository": "https://github.com/MinaAmrouche/klearframe-agent-team",
+  "license": "MIT",
+  "keywords": ["agent-team", "subagents", "linear", "tdd", "code-review", "qa", "branch-protection"]
 }
