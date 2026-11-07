@@ -74,17 +74,91 @@ while IFS= read -r seg; do
   fi
 done < <(printf '%s\n' "$cmd" | tr ';&|' '\n\n\n')
 
-# Skipping the project's git hooks. Quoted text (such as a commit message) is
-# removed first, and only segments that start with git count, so a message or
-# heredoc line that mentions --no-verify is not blocked.
-unquoted=$(printf '%s\n' "$cmd" | sed -E "s/'[^']*'//g; s/\"([^\"\\\\]|\\\\.)*\"//g")
-git_cmd='^[[:space:]]*([A-Za-z_][A-Za-z0-9_]*=[^[:space:]]*[[:space:]]+)*git([[:space:]]+-[cC][[:space:]]+[^[:space:]]+)*[[:space:]]+'
+# Skipping the project's git hooks: --no-verify on commit, push, merge, am or
+# rebase, -n on commit, `-c core.hooksPath=...` or HUSKY=0.
+#
+# First, so text inside a commit message can't trigger or hide a block: drop
+# heredoc bodies, join backslash-newline continuations, and replace each quoted
+# string with Q (leftmost quote first, across lines). POSIX awk, for macOS too.
+read -r -d '' strip_text <<'AWK'
+{ lines[NR] = $0 }
+END {
+  text = ""; delim = ""
+  for (i = 1; i <= NR; i++) {
+    l = lines[i]
+    if (delim != "") { t = l; sub(/^\t+/, "", t); if (t == delim) delim = ""; continue }
+    if (match(l, /<<-?[ \t]*['"]?[A-Za-z_][A-Za-z0-9_]*['"]?/) && (RSTART == 1 || substr(l, RSTART - 1, 1) != "<")) {
+      d = substr(l, RSTART, RLENGTH); sub(/^<<-?[ \t]*/, "", d); gsub(/['"]/, "", d); delim = d
+    }
+    text = text l "\n"
+  }
+  gsub(/\\\n/, " ", text)
+  out = ""; q = ""; n = length(text)
+  for (i = 1; i <= n; i++) {
+    c = substr(text, i, 1)
+    if (q == "") {
+      if (c == "'" || c == "\"") { q = c; out = out " Q "; continue }
+      if (c == "\\") { out = out substr(text, i, 2); i++; continue }
+      out = out c
+    } else if (q == "\"" && c == "\\") { i++ }
+    else if (c == q) { q = "" }
+  }
+  printf "%s", out
+}
+AWK
+
+# One simple command, quotes already replaced: succeeds when it skips git hooks.
+skips_hooks() {
+  local w c i state=pre sub="" skip=0 off=0
+  for w in $1; do
+    if [ "$skip" = 1 ]; then
+      skip=0
+      case "$state:$w" in global:core.hooks[Pp]ath=*) off=1 ;; esac
+      continue
+    fi
+    case "$state" in
+      pre) # wrappers and variable assignments before git
+        case "$w" in
+          if | then | do | else | elif | while | until | '!' | time | command | env | exec | nohup | sudo) ;;
+          HUSKY=0) off=1 ;;
+          [A-Za-z_]*=*) ;;
+          git) state=global ;;
+          *) return 1 ;;
+        esac ;;
+      global) # git's own options, then the subcommand
+        case "$w" in
+          -C | -c) skip=1 ;;
+          -*) ;;
+          commit | push | merge | am | rebase) sub="$w"; state=args; [ "$off" = 1 ] && return 0 ;;
+          *) return 1 ;;
+        esac ;;
+      args)
+        case "$w" in
+          --no-verify) return 0 ;;
+          --*) ;;
+          -?*) # on commit, -n in a short cluster, before any option that takes a value
+            [ "$sub" = commit ] || continue
+            i=1
+            while [ "$i" -lt "${#w}" ]; do
+              c="${w:$i:1}"
+              case "$c" in
+                n) return 0 ;;
+                m | F | C | c | t) [ "$i" -eq $((${#w} - 1)) ] && skip=1; break ;;
+                u | S) break ;;
+              esac
+              i=$((i + 1))
+            done ;;
+        esac ;;
+    esac
+  done
+  return 1
+}
+
+unquoted=$(printf '%s\n' "$cmd" | awk "$strip_text")
 while IFS= read -r seg; do
-  [[ "$seg" =~ $git_cmd ]] || continue
-  if [[ "$seg" =~ [[:space:]]--no-verify([[:space:]]|$) ]] ||
-    { [[ "$seg" =~ ${git_cmd}commit([[:space:]]|$) ]] && [[ "$seg" =~ [[:space:]]-[A-Za-z]*n[A-Za-z]*([[:space:]]|$) ]]; }; then
-    echo "Blocked: this skips the project's git hooks (--no-verify). Fix what the hooks report instead, or ask the user." >&2
+  if skips_hooks "$seg"; then
+    echo "Blocked: this skips the project's git hooks. Fix what the hooks report instead, or ask the user." >&2
     exit 2
   fi
-done < <(printf '%s\n' "$unquoted" | tr ';&|' '\n\n\n')
+done < <(printf '%s\n' "$unquoted" | tr ';&|(){}' '\n\n\n\n\n\n\n')
 exit 0

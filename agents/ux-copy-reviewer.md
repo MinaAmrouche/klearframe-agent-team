@@ -26,4 +26,4 @@ Read the project's `CLAUDE.md` for the product's voice, its languages and any gl
 
 1. **Copy issues:** a table with file and line, current text, the problem, proposed text, and severity (🟠 MAJOR blocks or misleads the user, 🟡 MINOR, 🔵 SUGGESTION).
 2. **Terms with two names:** each pair, and the one to keep.
-3. **Verdict:** ✅ ship it, or 🔄 worth fixing first.
+3. **Verdict:** ✅ ship it, or ❌ fix before merge (any MAJOR).

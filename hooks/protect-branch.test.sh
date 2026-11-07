@@ -41,7 +41,7 @@ run_path() { # hook-PATH expected-exit command
 
 # PATHs without jq: the tools the hook needs, with and without python3.
 mkdir -p "$tmp/nojq" "$tmp/nojq-nopy"
-for t in cat git grep head sed tail tr; do
+for t in awk cat git grep head tail tr; do
   ln -s "$(command -v "$t")" "$tmp/nojq/$t"
   ln -s "$(command -v "$t")" "$tmp/nojq-nopy/$t"
 done
@@ -111,19 +111,45 @@ run 2 'npm test && git commit --no-verify -m wip'
 run 2 'git -C /some/dir commit --no-verify'
 run 2 'GIT_AUTHOR_NAME=x git commit -n'
 run 2 'git merge --no-verify feature'
+run 2 'git commit -m "$(cat <<'"'"'EOF'"'"'
+Fix the thing
+EOF
+)" --no-verify'
+run 2 'git commit -m wip \
+  --no-verify'
+run 2 "git commit -m \"don't crash\" --no-verify -m \"it's fine\""
+run 2 '(cd x && git commit --no-verify)'
+run 2 'if git commit --no-verify -m x; then echo ok; fi'
+run 2 'time git commit -n'
+run 2 'env X=1 git commit --no-verify'
+run 2 'git --no-pager commit -n'
+run 2 'git -C "/my repo" commit -n'
+run 2 'git -c core.hooksPath=/dev/null commit -m wip'
+run 2 'HUSKY=0 git commit -m wip'
 run_path "$tmp/nojq" 2 'git commit --no-verify -m wip'
 run_path "$tmp/nojq-nopy" 2 'git commit --no-verify -m wip'
-# ...but not a message, a heredoc line or another command that mentions it
+# ...but not a message, a heredoc body or another command that mentions it
 run 0 'git commit -m "Block --no-verify in the hook"'
 run 0 "git commit -m 'skip -n here'"
 run 0 'git commit -m "say \"--no-verify\" twice" --amend'
 run 0 "git commit -F - <<'EOF'
 Block git commit --no-verify
 EOF"
+run 0 "git commit -F - <<'EOF'
+Hook: block pushes; git commit --no-verify too
+EOF"
+run 0 'git commit -m "first line
+git commit -n works"'
 run 0 'echo --no-verify'
 run 0 'git log -n 5'
 run 0 'git commit --amend --no-edit'
 run 0 'grep -rn -- --no-verify docs'
+run 0 'git grep -n -- --no-verify'
+run 0 'git commit -uno -m wip'
+run 0 'git commit -mnote'
+run 0 'git push -n origin develop'
+run 0 'git merge -n feature'
+run 0 'cat <<< "git commit --no-verify"'
 
 # A bare push while on the protected branch is blocked.
 git -C "$repo" switch -q -c master

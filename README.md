@@ -8,7 +8,7 @@ You act as CEO/CTO: you set the business rules, the priorities and the major tec
 
 - **Agents:** `product-analyst`, `architect`, `backend-engineer`, `frontend-engineer`, `qa-engineer` and `senior-code-reviewer`, plus three specialists the team lead calls only when a branch needs them: `security-reviewer`, `silent-failure-hunter` and `ux-copy-reviewer`. Claude names them with the plugin prefix, for example `klearframe-agent-team:architect`.
 - **Skills:** `klearframe-agent-team:team-lead` takes a feature from a rough need to a merged pull request. `klearframe-agent-team:whats-next` answers "what's next?" and picks up work where it was left off. `klearframe-agent-team:linear-ticket` writes Linear tickets, and captures an idea as a ticket without starting the work.
-- **Hook:** blocks `git push` to `master` or `main`, and `gh pr merge` into them, so only you release to production. It also blocks git commands that skip the project's git hooks (`--no-verify`).
+- **Hook:** blocks `git push` to `master` or `main`, and `gh pr merge` into them, so only you release to production. It also blocks git commands that skip the project's git hooks (`--no-verify`, `core.hooksPath`, `HUSKY=0`).
 
 ## How a feature flows
 
