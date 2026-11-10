@@ -33,6 +33,12 @@ Never set In Review or Done yourself: Linear's GitHub automations do it, as long
 
 **Ask first:** anything that moves an item against the user's order, closing or cancelling a ticket, and any edit to the priorities document.
 
+## Reproduce bugs first
+
+Before fixing a bug, reproduce it on the base branch: on the running app when the project's `CLAUDE.md` says how to run it there, otherwise with a failing test. Dispatch `qa-engineer` with the ticket to do it; the `team-lead` flow says when. When it reproduced with a test, keep that test: it's the first failing test of the fix once the branch exists.
+
+If it doesn't reproduce, stop and report it to the user instead of fixing what the ticket describes: what was tried, on which base-branch commit, and what was observed. Don't shape, spec or branch for it until they answer.
+
 ## Review findings
 
 Before fixing anything a reviewer or QA reports, check each finding against the code and sort it:
@@ -47,7 +53,7 @@ Drop a low-risk finding when its only fix is one more guard, check or fallback f
 
 A reviewer's **Not verified** items are not findings yet. Check each one yourself and sort it like a finding; if you can't settle it, list it under the PR's Open items.
 
-**Fix rounds.** A round is fixing findings, then re-running whoever raised them. When you re-run a reviewer, give it the findings you sorted **False** or **Later**, each with its line of why, so it doesn't raise them again. From the whole-branch checks on (team-lead step 8, and whats-next), stop after 3 rounds that still leave a critical or major finding or a failing validation step, or as soon as a fixed failure comes back. Post a project update set to *at risk*, and tell the user what keeps failing, what was tried and what you recommend. Once the user answers with a direction, the count starts again at 0; note the reset in the PR's Reviews part. Within a single task, superpowers:subagent-driven-development keeps its own review loop.
+**Fix rounds.** A round is fixing findings, then re-running whoever raised them. When you re-run a reviewer, give it the findings you sorted **False** or **Later**, each with its line of why, so it doesn't raise them again. From the whole-branch checks on (team-lead step 9, and whats-next), stop after 3 rounds that still leave a critical or major finding or a failing validation step, or as soon as a fixed failure comes back. Post a project update set to *at risk*, and tell the user what keeps failing, what was tried and what you recommend. Once the user answers with a direction, the count starts again at 0; note the reset in the PR's Reviews part. Within a single task, superpowers:subagent-driven-development keeps its own review loop.
 
 ## When the user isn't there
 

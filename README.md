@@ -13,11 +13,12 @@ You act as CEO/CTO: you set the business rules, the priorities and the major tec
 ## How a feature flows
 
 1. **Ticket.** The team lead files the need as a Linear ticket in Backlog.
-2. **Shape.** The product analyst and the architect read the code and draft the decisions only you can make. The team lead asks you about them one at a time.
-3. **Spec and one approval.** The team lead writes the spec with your decisions numbered, puts the business rules and validation steps on the ticket, and asks you to approve the ticket. That's the only approval.
-4. **Build.** It plans the work, has the architect check the plan delivers every decision in full, and hands each task to the backend or frontend engineer, test-first, with a code review after each task.
-5. **Prove it.** The QA engineer targets what no test covered, adds adversarial tests and runs the ticket's validation steps on the real app. The senior reviewer checks the whole branch against the spec, joined by the specialists the diff calls for. The team lead sorts every finding before fixing it, and stops to ask you after 3 rounds that don't converge.
-6. **Pull request.** The team lead opens a PR linked to the ticket, listing any guesses it made while waiting for you and what a rollback would cost, and merges it into your base branch once every merge condition holds. Releasing to production stays with you.
+2. **Reproduce (bugs).** The QA engineer reproduces the bug on the base branch, on the running app or with a failing test. If it doesn't reproduce, the team lead stops and reports it to you instead of fixing what the ticket describes.
+3. **Shape.** The product analyst and the architect read the code and draft the decisions only you can make. The team lead asks you about them one at a time.
+4. **Spec and one approval.** The team lead writes the spec with your decisions numbered, puts the business rules and validation steps on the ticket, and asks you to approve the ticket. That's the only approval.
+5. **Build.** It plans the work, has the architect check the plan delivers every decision in full, and hands each task to the backend or frontend engineer, test-first, with a code review after each task.
+6. **Prove it.** The QA engineer targets what no test covered, adds adversarial tests and runs the ticket's validation steps on the real app. The senior reviewer checks the whole branch against the spec, joined by the specialists the diff calls for. The team lead sorts every finding before fixing it, and stops to ask you after 3 rounds that don't converge.
+7. **Pull request.** The team lead opens a PR linked to the ticket, listing any guesses it made while waiting for you and what a rollback would cost, and merges it into your base branch once every merge condition holds. Releasing to production stays with you.
 
 ## Requirements
 
