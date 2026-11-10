@@ -45,6 +45,6 @@ End with a question asking which option to take. If you drafted the priorities d
   - *Needs more work* (ticket scope not done): continue it with the `team-lead` skill from its Plan and build step.
   - *Ready* (every merge condition in `team-rules.md` holds): merge it.
 - **Branch without a PR:** compare it with its ticket and plan, then continue with the `team-lead` skill from the right step.
-- **Ticket not started:** hand it to the `team-lead` skill at its Shape step, which moves the ticket to Todo and shapes it with the user.
+- **Ticket not started:** hand it to the `team-lead` skill at its Reproduce step for a bug, otherwise at its Shape step, which moves the ticket to Todo and shapes it with the user.
 
 Post a project update whenever one of the changes listed in `team-rules.md` happens.
